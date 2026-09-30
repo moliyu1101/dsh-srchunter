@@ -54,9 +54,15 @@ const readText = file => fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n')
  * one source of truth rather than hand edits under `lib/`. The host service
  * namespace (`@deepseek-ai/*`, including the snapshot's own `@module` tags) is
  * deliberately NOT rewritten: those specifiers resolve through the host loader.
+ *
+ * The legacy `/<surface-subpath>` suffix is dropped onto the bare package name
+ * while rewriting, because the host's client-module discovery keys on the bare
+ * specifier: `exactPackageSpecifier` rejects a subpath row name before it ever
+ * reads a manifest, and the host's own client bundles all register as
+ * `<package>`, `<package>` and `<package>/<Stylesheet>.module.css`.
  */
 const PACKAGE_NAME = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).name
-const PACKAGE_IDENTITY = /@(?!(?:deepseek-ai)\/)[\w.-]+\/dsh-srchunter/g
+const PACKAGE_IDENTITY = /@(?!(?:deepseek-ai)\/)[\w.-]+\/dsh-srchunter(?:\/ui-srchunter)?/g
 
 /** Point every bundle-owned identity literal in `text` at the current package name. */
 const normalizeIdentity = text => text.replace(PACKAGE_IDENTITY, PACKAGE_NAME)

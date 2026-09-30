@@ -1,7 +1,7 @@
 {
   "name": "@moliyu1101/dsh-srchunter",
   "description": "DSH 漏洞挖掘模式：以探索链路记录目标、线索、资产与漏洞，并在 Web 中可视化展示。",
-  "version": "0.1.0-rc.27",
+  "version": "0.1.0-rc.28",
   "publishConfig": {
     "access": "public"
   },

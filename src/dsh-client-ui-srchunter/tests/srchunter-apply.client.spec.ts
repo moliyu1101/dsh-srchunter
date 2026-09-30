@@ -24,11 +24,21 @@ type RegisterDictionary = (_ns: string, _dicts: { zh: Record<string, string>; en
 /** The fake ctx effect's signature (runs the function, keeps its disposer). */
 type RunEffect = (fn: () => () => void) => () => void
 
+/** One harness row: either host's row shape is writable. */
+interface HarnessRow {
+  agentPreset?: string
+  parentId?: string
+  parentSessionId?: string
+  projectionValues?: { agentPreset?: string }
+}
+
 /** Driving harness: fake slots/locale/sessions services with manual notify. */
 function boot(): {
   setCurrent(id: string | undefined): void
   setPreset(id: string, preset: string | undefined): void
   setParent(id: string, parentId: string | undefined): void
+  setProjectionPreset(id: string, preset: string | undefined): void
+  setParentSession(id: string, parentSessionId: string | undefined): void
   touchList(): void
   disposeInjection(): void
   registeredIds(): string[]
@@ -43,7 +53,7 @@ function boot(): {
   const registered = new Map<string, unknown>()
   const injectNames: string[] = []
   let current: string | undefined
-  const byId = new Map<string, { agentPreset?: string; parentId?: string }>()
+  const byId = new Map<string, HarnessRow>()
   let injectDispose: (() => void) | undefined
 
   const register = (options: RegisterCall['options'], component: unknown) => {
@@ -85,16 +95,30 @@ function boot(): {
       for (const fn of [...listListeners]) fn()
     },
     setPreset(id, preset) {
-      const row: { agentPreset?: string; parentId?: string } = { ...byId.get(id) }
+      const row: HarnessRow = { ...byId.get(id) }
       if (preset === undefined) delete row.agentPreset
       else row.agentPreset = preset
       byId.set(id, row)
       for (const fn of [...listListeners]) fn()
     },
     setParent(id, parentId) {
-      const row: { agentPreset?: string; parentId?: string } = { ...byId.get(id) }
+      const row: HarnessRow = { ...byId.get(id) }
       if (parentId === undefined) delete row.parentId
       else row.parentId = parentId
+      byId.set(id, row)
+      for (const fn of [...listListeners]) fn()
+    },
+    setProjectionPreset(id, preset) {
+      const values: { agentPreset?: string } = { ...byId.get(id)?.projectionValues }
+      if (preset === undefined) delete values.agentPreset
+      else values.agentPreset = preset
+      byId.set(id, { ...byId.get(id), projectionValues: values })
+      for (const fn of [...listListeners]) fn()
+    },
+    setParentSession(id, parentSessionId) {
+      const row: HarnessRow = { ...byId.get(id) }
+      if (parentSessionId === undefined) delete row.parentSessionId
+      else row.parentSessionId = parentSessionId
       byId.set(id, row)
       for (const fn of [...listListeners]) fn()
     },
@@ -169,6 +193,23 @@ describe('srchunter surface registration', () => {
     h.setCurrent(undefined) // no current session
     expect(h.registeredIds()).toEqual([])
     expect(h.registerCalls()).toHaveLength(3)
+  })
+
+  it('mounts the tab when the host nests the preset under projectionValues', () => {
+    const h = boot()
+    // DSH 0.1.1+ rows fold the session projection state (preset included) into
+    // `projectionValues` and spell lineage `parentSessionId`; the gate reads both.
+    h.setProjectionPreset('s-new', 'srchunter')
+    h.setCurrent('s-new')
+    expect(h.registeredIds()).toEqual(['srchunter'])
+
+    h.setParentSession('s-child', 's-new')
+    h.setCurrent('s-child')
+    expect(h.registeredIds()).toEqual(['srchunter'])
+
+    h.setProjectionPreset('s-new', 'standard')
+    h.setCurrent('s-new')
+    expect(h.registeredIds()).toEqual([])
   })
 
   it('mounts the tab for subagents of a srchunter session and hides it for others', () => {

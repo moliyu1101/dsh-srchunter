@@ -39,19 +39,44 @@ type CurrentSessionId = SessionListState['current']
 const SRCHUNTER_PRESET = 'srchunter'
 
 /**
+ * One sessions-list row, as far as its shape is known. The preset id sat on the
+ * row itself up to DSH 0.1.0-rc.6; later hosts fold the session's projection
+ * state into `projectionValues` (preset included) and spell lineage
+ * `parentSessionId`. Both are read because this gate fails silently: a row
+ * shape it does not understand is simply no tab, with nothing logged.
+ */
+interface SessionRow {
+  readonly agentPreset?: string
+  readonly parentId?: string
+  readonly parentSessionId?: string
+  readonly projectionValues?: {
+    readonly agentPreset?: string
+  }
+}
+
+/** The preset id a row declares, under either host shape. */
+function presetOf(row: SessionRow | undefined): string | undefined {
+  return row?.agentPreset ?? row?.projectionValues?.agentPreset
+}
+
+/** The parent a row declares, under either host shape. */
+function parentOf(row: SessionRow | undefined): string | undefined {
+  return row?.parentId ?? row?.parentSessionId
+}
+
+/**
  * Whether a session is composed from the srchunter preset — the session itself
  * or any listed ancestor (subagents of a srchunter session inherit its preset;
- * their own rows may or may not carry `agentPreset` on the wire).
+ * their own rows may carry no preset at all).
  */
 function isSrchunterSession(snapshot: SessionListState, id: string): boolean {
   let cursor: string | undefined = id
   const seen = new Set<string>()
-  const byId = snapshot.byId as Readonly<Record<string, { agentPreset?: string; parentId?: string } | undefined>>
+  const byId = snapshot.byId as Readonly<Record<string, SessionRow | undefined>>
   while (cursor !== undefined && !seen.has(cursor)) {
     seen.add(cursor)
-    const row: { agentPreset?: string; parentId?: string } | undefined = byId[cursor]
-    if (row?.agentPreset === SRCHUNTER_PRESET) return true
-    cursor = row?.parentId
+    if (presetOf(byId[cursor]) === SRCHUNTER_PRESET) return true
+    cursor = parentOf(byId[cursor])
   }
   return false
 }

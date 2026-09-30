@@ -33,9 +33,11 @@ describe('srchunter bundle', () => {
     expect(insert).toBeDefined()
     const rows = (insert!['insert'] as Array<{ id: string; name: string }>).map(row => ({ id: row.id, name: row.name }))
     // Every row resolves to a subpath of the self-contained bundle package,
-    // so a single tarball installs the whole mode.
+    // so a single tarball installs the whole mode. The Web surface row is the
+    // exception on purpose: the host's client discovery only accepts a bare
+    // package specifier, so a subpath row name would ship a UI nobody loads.
     expect(rows).toEqual([
-      { id: 'ui-srchunter', name: '@moliyu1101/dsh-srchunter/ui-srchunter' },
+      { id: 'ui-srchunter', name: '@moliyu1101/dsh-srchunter' },
       { id: 'storage-sqlite', name: '@moliyu1101/dsh-srchunter/storage-sqlite' },
     ])
     const sqlite = insert!['insert'].find((row: { id: string }) => row.id === 'storage-sqlite') as { config?: { path?: string } }

@@ -16,8 +16,12 @@
 # preset is selected, causing client command invalidation loops.
 
 - insert:
+    # 界面行必须用「裸包名」说明符：这一代宿主的 client 发现（dsh-client-modules）先按
+    # exactPackageSpecifier 取 `@scope/name` 形态，带子路径的行名会在解析包清单之前直接被
+    # 丢弃，于是浏览器永远收不到这个 client 模块（页面不出现、也没有任何报错）。
+    # 同理，产物里注册的 loader id / dataset.plugin / dsh-css tagId 前缀也必须是裸包名。
     - id: ui-srchunter
-      name: '@moliyu1101/dsh-srchunter/ui-srchunter'
+      name: '@moliyu1101/dsh-srchunter'
 
     - id: storage-sqlite
       name: '@moliyu1101/dsh-srchunter/storage-sqlite'
