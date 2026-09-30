@@ -1,0 +1,12 @@
+# 依赖与构建临时产物
+node_modules/
+*.tgz
+*.tsbuildinfo
+.build-srchunter/
+**/coverage/
+src/dsh-client-ui-srchunter/vitest.config.ts
+
+# 编辑器/系统杂项
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,240 @@
+/* The 探索链路 sub-tab: an interactive chain graph. The graph surface fills
+   the content area; nodes are small cards with a kind badge. */
+
+.graph {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 320px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--dsw-alias-bg-base);
+}
+
+/* React Flow ships a white control bar. Scope the override to this graph so
+   the controls follow the DSH light/dark semantic tokens. */
+.graph :global(.react-flow__controls) {
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 6px;
+  box-shadow: none;
+  background: var(--dsw-alias-bg-layer-1);
+}
+
+.graph :global(.react-flow__controls-button) {
+  border-bottom-color: var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-secondary);
+}
+
+.graph :global(.react-flow__controls-button:hover) {
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+}
+
+.graph :global(.react-flow__controls-button svg) {
+  fill: currentColor;
+}
+
+/* The floating chain legend: one chip per kind present, with its count. */
+.legend {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 16px);
+  padding: 4px 6px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1);
+  pointer-events: none;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.legendItem[data-kind='goal'] {
+  color: var(--dsw-alias-brand-primary);
+  background: var(--dsw-alias-state-business-tertiary);
+}
+
+.legendItem[data-kind='fact'] {
+  color: var(--dsw-alias-state-business-primary);
+  background: var(--dsw-alias-state-business-tertiary);
+}
+
+.legendItem[data-kind='finding'] {
+  color: var(--dsw-alias-state-warn-primary);
+  background: var(--dsw-alias-state-warn-tertiary);
+}
+
+.legendCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.legendHint {
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-caption);
+}
+
+.empty {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 24px;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--dsw-alias-label-caption);
+}
+
+.node {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 236px;
+  height: 120px;
+  overflow: hidden;
+  padding: 8px 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1);
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.node:hover {
+  border-color: var(--dsw-alias-border-l1);
+}
+
+.node[data-kind='goal'] {
+  border-color: var(--dsw-alias-border-l1);
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+.handle {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+/* The relationship pill on every chain edge (rendered by EdgeLabelRenderer). */
+.edgeLabel {
+  position: absolute;
+  padding: 2px 8px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-secondary);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.node[data-kind='goal'] .badge {
+  color: var(--dsw-alias-brand-primary);
+  background: var(--dsw-alias-state-business-tertiary);
+}
+
+.node[data-kind='fact'] .badge {
+  color: var(--dsw-alias-state-business-primary);
+  background: var(--dsw-alias-state-business-tertiary);
+}
+
+.node[data-kind='finding'] .badge {
+  color: var(--dsw-alias-state-warn-primary);
+  background: var(--dsw-alias-state-warn-tertiary);
+}
+
+/* The intent verdict rides the same badge element as the kind, so verdict
+   styling stays an attribute-selector extension of the badge rule set. */
+.badge[data-status='deepen'] {
+  color: var(--dsw-alias-state-warn-primary);
+  background: var(--dsw-alias-state-warn-tertiary);
+}
+
+.badge[data-status='blocked'] {
+  color: var(--dsw-alias-state-error-primary);
+  background: var(--dsw-alias-state-error-tertiary);
+}
+
+.badge[data-status='dead_end'] {
+  color: var(--dsw-alias-label-tertiary);
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+.badge[data-status='done'] {
+  color: var(--dsw-alias-state-success-primary);
+  background: var(--dsw-alias-state-success-tertiary);
+}
+
+.title {
+  min-width: 0;
+  color: var(--dsw-alias-label-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail {
+  min-width: 0;
+  color: var(--dsw-alias-label-tertiary);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.severity {
+  align-self: flex-start;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.severity[data-severity='critical'],
+.severity[data-severity='high'] {
+  color: #fff;
+  background: var(--dsw-alias-state-error-primary);
+}
+
+.severity[data-severity='medium'] {
+  color: #fff;
+  background: var(--dsw-alias-state-warn-primary);
+}

@@ -1,0 +1,220 @@
+/* The 漏洞挖掘 conversation-view tab: one engagement header card (target,
+   stats, severity distribution) over the sticky sub-tab bar and the active
+   sub-tab content. Scrolls independently inside the session viewport. */
+
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.card {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  background: var(--dsw-alias-bg-layer-1);
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 12px;
+}
+
+.cardTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.target {
+  flex: none;
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+  overflow-wrap: anywhere;
+}
+
+.objective {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 24px;
+  color: var(--dsw-alias-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.pending {
+  appearance: none;
+  flex: none;
+  padding: 1px 10px;
+  border: 1px solid var(--dsw-alias-state-warn-primary);
+  border-radius: 999px;
+  background: none;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--dsw-alias-state-warn-primary);
+  cursor: pointer;
+}
+
+.pending:hover {
+  background: var(--dsw-alias-state-warn-primary);
+  color: #fff;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 9px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-base);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.statValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.severities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.severityChip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+}
+
+.severityChip b {
+  color: inherit;
+}
+
+.severityChip[data-severity='critical'],
+.severityChip[data-severity='high'] {
+  background: var(--dsw-alias-state-error-primary);
+  color: #fff;
+}
+
+.severityChip[data-severity='medium'] {
+  background: var(--dsw-alias-state-warn-primary);
+  color: #fff;
+}
+
+.severityChip[data-severity='low'] {
+  background: var(--dsw-alias-state-business-primary);
+  color: #fff;
+}
+
+.authorization {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  flex: none;
+  display: flex;
+  gap: 4px;
+  padding: 4px 0 0;
+  background: var(--dsw-alias-bg-base);
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.tab {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: none;
+  padding: 6px 12px;
+  border-radius: 8px 8px 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-tertiary);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.tab[aria-pressed='true'] {
+  color: var(--dsw-alias-label-primary);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--dsw-alias-brand-primary);
+}
+
+.tabCount {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.tab[aria-pressed='true'] .tabCount {
+  background: var(--dsw-alias-brand-primary);
+  color: #fff;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 24px;
+}
+
+.emptyText {
+  max-width: 480px;
+  font-size: 13px;
+  line-height: 22px;
+  text-align: center;
+  color: var(--dsw-alias-label-tertiary);
+}
