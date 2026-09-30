@@ -11,13 +11,20 @@
 ### 从 Release URL 安装
 
 ```powershell
-dsh plugin --profile web add https://github.com/moliyu1101/dsh-srchunter/releases/latest/download/dsh-srchunter.tar.gz
+dsh plugin --profile web add -w https://github.com/moliyu1101/dsh-srchunter/releases/download/v0.1.0-rc.28/dsh-srchunter.tar.gz
 ```
+
+装带版本的地址而不是 `releases/latest/...`：profile 的依赖由 pnpm 按 URL 缓存，`latest` 这个地址
+不变而内容会变，升级时可能仍然解出旧字节（实测把 `latest` 换成新发布后，装到的还是上一版）。
+`-w` 是因为 profile 目录本身是一个 pnpm workspace 的根。
+
+DSH Desktop 的 `desktop` profile 由 Electron 应用独占管理，`dsh plugin --profile desktop add` 会被
+拒绝；要在桌面端用这个模式，请从应用内的插件入口安装，或者用 `dsh --profile web` 起 Web 界面。
 
 ### 或下载后从本地文件安装
 
 ```powershell
-dsh plugin --profile web add file:C:\path\to\dsh-srchunter.tar.gz
+dsh plugin --profile web add -w file:C:\path\to\dsh-srchunter.tar.gz
 ```
 
 重启 dsh 后，在新会话中选择自动注册的「漏洞挖掘模式」。
@@ -38,7 +45,7 @@ dsh plugin --profile web add file:C:\path\to\dsh-srchunter.tar.gz
   ```powershell
   node scripts/rebuild-artifacts.mjs
   npm pack --pack-destination .
-  dsh plugin --profile web add file:C:\path\to\moliyu1101-dsh-srchunter-<version>.tgz
+  dsh plugin --profile web add -w file:C:\path\to\moliyu1101-dsh-srchunter-<version>.tgz
   ```
 
   重装后界面仍是旧文案时，先核对装进去的是不是新产物——对比
